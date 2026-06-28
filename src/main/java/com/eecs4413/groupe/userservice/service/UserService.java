@@ -1,0 +1,56 @@
+package com.eecs4413.groupe.userservice.service;
+
+import com.eecs4413.groupe.userservice.exception.*;
+import com.eecs4413.groupe.userservice.model.User;
+import com.eecs4413.groupe.userservice.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class UserService {
+
+    private final UserRepository _userRepository;
+
+    public UserService(UserRepository userRepository) {
+        _userRepository = userRepository;
+    }
+
+    public List<User> getAllUsers() {
+        return _userRepository.findAll();
+    }
+
+    public User getUserById(UUID id) {
+        return _userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+    }
+
+    public User addUser(User user) {
+        if (_userRepository.existsByEmail(user.getEmail())) {
+            throw new EmailNotUniqueException(user.getEmail());
+        }
+
+        user.setId(null);
+
+        return _userRepository.save(user);
+    }
+
+    public User updateUser(UUID id, User user) {
+        User currentUser = _userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+
+        if (!user.getEmail().equals(currentUser.getEmail()) && _userRepository.existsByEmail(user.getEmail())) {
+            throw new EmailNotUniqueException(user.getEmail());
+        }
+
+        user.setId(id);
+
+        return _userRepository.save(user);
+    }
+
+    public void deleteUserById(UUID id) {
+        if(!_userRepository.existsById(id)) throw new UserNotFoundException(id);
+
+        _userRepository.deleteById(id);
+    }
+}

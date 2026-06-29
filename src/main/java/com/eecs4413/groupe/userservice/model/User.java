@@ -2,6 +2,7 @@ package com.eecs4413.groupe.userservice.model;
 
 import com.eecs4413.groupe.userservice.model.enums.*;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ public class User {
     private UUID id;
 
     @Column(name = "email", nullable = false)
+    @Email
     private String email;
 
     @Enumerated(EnumType.STRING)

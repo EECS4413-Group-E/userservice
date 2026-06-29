@@ -15,7 +15,7 @@ public class User {
     private UUID id;
 
     @Column(name = "email", nullable = false)
-    @Email
+    @Email(message = "Invalid email format")
     private String email;
 
     @Enumerated(EnumType.STRING)

@@ -45,5 +45,14 @@ public class GlobalExceptionHandler {
                 .badRequest()
                 .body(new ErrorResponse(stringBuilder.toString()));
     }
+    
+    @ExceptionHandler(WishListItemAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleWishlistItemAlreadyExists(WishListItemAlreadyExistsException ex) {
+
+        return ResponseEntity
+                .badRequest()
+                .body(new ErrorResponse(ex.getMessage()));
+    }
+
 
 }

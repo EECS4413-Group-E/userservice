@@ -18,11 +18,11 @@ public interface WishListRepository extends JpaRepository<WishListItem, UUID> {
 	List<WishListItem> findByUserId(UUID userId);
 	
 	@Transactional
-	@Query("SELECT exists(SELECT w FROM WishListItem w WHERE w.userId = ?1 AND w.productId = ?2)")
-    boolean existsByUserIdAndProductId(UUID userId, UUID productId);
+	@Query("SELECT exists(SELECT w FROM WishListItem w WHERE w.userId = ?1 AND w.listingId = ?2)")
+    boolean existsByUserIdAndlistingId(UUID userId, UUID listingId);
 	
 	@Transactional
 	@Modifying
-	@Query("DELETE FROM WishListItem w WHERE w.userId = ?1 AND w.productId = ?2")
-    void deleteByUserIdAndProductId(UUID userId, UUID productId);
+	@Query("DELETE FROM WishListItem w WHERE w.userId = ?1 AND w.listingId = ?2")
+    void deleteByUserIdAndlistingId(UUID userId, UUID listingId);
 }

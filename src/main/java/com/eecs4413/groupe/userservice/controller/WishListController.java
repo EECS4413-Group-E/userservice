@@ -25,23 +25,23 @@ public class WishListController {
         return new ResponseEntity<>(wishlist, HttpStatus.OK);
     }
 
-    @PostMapping("/{productId}")
+    @PostMapping("/{listingId}")
     public ResponseEntity<WishListItem> addProductToWishlist(
             @PathVariable UUID userId,
-            @PathVariable UUID productId) {
+            @PathVariable UUID listingId) {
 
         WishListItem wishlistItem =
-                _wishlistService.addProductToWishlist(userId, productId);
+                _wishlistService.addListingToWishlist(userId, listingId);
 
         return new ResponseEntity<>(wishlistItem, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{productId}")
+    @DeleteMapping("/{listingId}")
     public ResponseEntity<String> removeProductFromWishlist(
             @PathVariable UUID userId,
-            @PathVariable UUID productId) {
+            @PathVariable UUID listingId) {
 
-        _wishlistService.removeProductFromWishlist(userId, productId);
+        _wishlistService.removeListingFromWishlist(userId, listingId);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

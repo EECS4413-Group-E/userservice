@@ -30,19 +30,19 @@ public class WishListService {
         
     }
 
-    public WishListItem addProductToWishlist(UUID userId, UUID productId) {
-        boolean alreadyExists = _wishlistRepository.existsByUserIdAndProductId(userId, productId);
+    public WishListItem addListingToWishlist(UUID userId, UUID listingId) {
+        boolean alreadyExists = _wishlistRepository.existsByUserIdAndlistingId(userId, listingId);
 
         if (alreadyExists) {
-        	throw new WishListItemAlreadyExistsException(userId, productId);
+        	throw new WishListItemAlreadyExistsException(userId, listingId);
         }
 
-        WishListItem wishlistItem = new WishListItem(userId, productId);
+        WishListItem wishlistItem = new WishListItem(userId, listingId);
         return _wishlistRepository.save(wishlistItem);
     }
 
     @Transactional
-    public void removeProductFromWishlist(UUID userId, UUID productId) {
-        _wishlistRepository.deleteByUserIdAndProductId(userId, productId);
+    public void removeListingFromWishlist(UUID userId, UUID listingId) {
+        _wishlistRepository.deleteByUserIdAndlistingId(userId, listingId);
     }
 }

@@ -9,7 +9,7 @@ import jakarta.persistence.*;
 @Table(
 	    name = "wishlist",
 	    uniqueConstraints = {
-	        @UniqueConstraint(columnNames = {"userId", "productId"}) /*To ensure same product is not added twice */
+	        @UniqueConstraint(columnNames = {"userId", "listingId"}) /*To ensure same product is not added twice */
 	    }
 	)
 
@@ -22,14 +22,14 @@ public class WishListItem {
 	 private UUID userId;
 
 	 @Column(nullable = false)
-	 private UUID productId;
+	 private UUID listingId;
 	 
 	 
 	 public WishListItem() {}
 
-	 public WishListItem(UUID userId, UUID productId) {
+	 public WishListItem(UUID userId, UUID listingId) {
 	       this.userId = userId;
-	       this.productId = productId;
+	       this.listingId = listingId;
 	 }
 
      public UUID getId() {
@@ -40,8 +40,8 @@ public class WishListItem {
         return userId;
      }
 
-     public UUID getProductId() {
-        return productId;
+     public UUID getListingId() {
+        return listingId;
      }
 
      public void setId(UUID id) {
@@ -52,8 +52,8 @@ public class WishListItem {
         this.userId = userId;
      }
 
-     public void setProductId(UUID productId) {
-        this.productId = productId;
+     public void setListingId(UUID listingId) {
+        this.listingId = listingId;
      }
 
 }

@@ -2,7 +2,7 @@ package com.eecs4413.groupe.userservice.service;
 
 import com.eecs4413.groupe.userservice.exception.UserNotFoundException;
 import com.eecs4413.groupe.userservice.exception.WishListItemAlreadyExistsException;
-import com.eecs4413.groupe.userservice.model.WishListItem;
+import com.eecs4413.groupe.userservice.model.entity.WishListItem;
 import com.eecs4413.groupe.userservice.repository.WishListRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

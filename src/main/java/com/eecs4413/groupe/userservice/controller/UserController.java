@@ -1,6 +1,6 @@
 package com.eecs4413.groupe.userservice.controller;
 
-import com.eecs4413.groupe.userservice.model.User;
+import com.eecs4413.groupe.userservice.model.entity.User;
 import com.eecs4413.groupe.userservice.service.UserService;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;

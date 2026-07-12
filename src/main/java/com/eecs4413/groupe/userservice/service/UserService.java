@@ -1,7 +1,7 @@
 package com.eecs4413.groupe.userservice.service;
 
 import com.eecs4413.groupe.userservice.exception.*;
-import com.eecs4413.groupe.userservice.model.User;
+import com.eecs4413.groupe.userservice.model.entity.User;
 import com.eecs4413.groupe.userservice.repository.UserRepository;
 import org.springframework.stereotype.Service;
 

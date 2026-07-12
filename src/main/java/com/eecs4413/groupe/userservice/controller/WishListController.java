@@ -1,6 +1,6 @@
 package com.eecs4413.groupe.userservice.controller;
 
-import com.eecs4413.groupe.userservice.model.WishListItem;
+import com.eecs4413.groupe.userservice.model.entity.WishListItem;
 import com.eecs4413.groupe.userservice.service.WishListService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

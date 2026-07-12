@@ -1,4 +1,4 @@
-package com.eecs4413.groupe.userservice.model;
+package com.eecs4413.groupe.userservice.model.entity;
 
 import java.util.UUID;
 

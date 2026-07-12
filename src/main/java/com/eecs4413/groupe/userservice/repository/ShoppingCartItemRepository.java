@@ -1,0 +1,31 @@
+package com.eecs4413.groupe.userservice.repository;
+
+import com.eecs4413.groupe.userservice.model.entity.ShoppingCartItem;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Repository
+public interface ShoppingCartItemRepository
+        extends JpaRepository<ShoppingCartItem, UUID> {
+
+    List<ShoppingCartItem> findAllByUserId(UUID userId);
+
+    Optional<ShoppingCartItem> findByUserIdAndProductIdAndSize(
+            UUID userId,
+            UUID productId,
+            String size
+    );
+
+    long deleteByUserIdAndProductIdAndSize(
+            UUID userId,
+            UUID productId,
+            String size
+    );
+
+    long deleteAllByUserId(UUID userId);
+}

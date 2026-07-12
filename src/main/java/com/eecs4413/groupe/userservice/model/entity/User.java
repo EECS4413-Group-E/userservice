@@ -1,4 +1,4 @@
-package com.eecs4413.groupe.userservice.model;
+package com.eecs4413.groupe.userservice.model.entity;
 
 import com.eecs4413.groupe.userservice.model.enums.*;
 import jakarta.persistence.*;

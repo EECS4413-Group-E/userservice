@@ -1,12 +1,12 @@
 package com.eecs4413.groupe.userservice.repository;
 
-import com.eecs4413.groupe.userservice.model.WishListItem;
-
 import jakarta.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+
+import com.eecs4413.groupe.userservice.model.entity.WishListItem;
 
 import java.util.List;
 import java.util.UUID;

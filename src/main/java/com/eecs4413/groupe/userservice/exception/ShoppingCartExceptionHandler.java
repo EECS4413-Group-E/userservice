@@ -1,16 +1,11 @@
 package com.eecs4413.groupe.userservice.exception;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
+import com.eecs4413.groupe.userservice.model.response.ErrorResponse;
 
-import java.time.Instant;
-import java.util.stream.Collectors;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -19,31 +14,8 @@ import java.time.Instant;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class ShoppingCartExceptionHandler {
 
-    private record ErrorResponse(
-            Instant timestamp,
-            int status,
-            String error,
-            String message,
-            String path
-    ) { }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintValidationErrors(ConstraintViolationException ex, HttpServletRequest request) {
-        String message = ex.getConstraintViolations().stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.joining("; "));
-
-        return ResponseEntity.badRequest().body(
-                new ErrorResponse(
-                        Instant.now(),
-                        HttpStatus.BAD_REQUEST.value(),
-                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                        message,
-                        request.getRequestURI()));
-    }
-    
     @ExceptionHandler(ShoppingCartItemNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleItemNotFound(
             ShoppingCartItemNotFoundException exception,
@@ -111,26 +83,15 @@ public class GlobalExceptionHandler {
             String path
     ) {
         ErrorResponse response = new ErrorResponse(
-                null, 0, status.getReasonPhrase(), path, path
+                Instant.now(),
+                status.value(),
+                status.getReasonPhrase(),
+                message,
+                path
         );
 
         return ResponseEntity
                 .status(status)
                 .body(response);
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationErrors(MethodArgumentNotValidException ex, HttpServletRequest request) {
-        String message = ex.getBindingResult().getFieldErrors().stream()
-                .map(FieldError::getDefaultMessage)
-                .collect(Collectors.joining("; "));
-
-        return ResponseEntity.badRequest().body(
-                new ErrorResponse(
-                        Instant.now(),
-                        HttpStatus.BAD_REQUEST.value(),
-                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                        message,
-                        request.getRequestURI()));
     }
 }

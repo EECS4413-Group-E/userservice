@@ -1,6 +1,7 @@
 package com.eecs4413.groupe.userservice.repository;
 
 import com.eecs4413.groupe.userservice.model.entity.ShoppingCartItem;
+import com.eecs4413.groupe.userservice.model.enums.Size;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -13,19 +14,19 @@ import java.util.UUID;
 public interface ShoppingCartItemRepository
         extends JpaRepository<ShoppingCartItem, UUID> {
 
-    List<ShoppingCartItem> findAllByUserId(UUID userId);
+	List<ShoppingCartItem> findAllByUser_Id(UUID userId);
 
-    Optional<ShoppingCartItem> findByUserIdAndProductIdAndSize(
-            UUID userId,
-            UUID productId,
-            String size
-    );
+	Optional<ShoppingCartItem> findByUser_IdAndProductIdAndSize(
+	        UUID userId,
+	        UUID productId,
+	        Size size
+	);
 
-    long deleteByUserIdAndProductIdAndSize(
-            UUID userId,
-            UUID productId,
-            String size
-    );
+	long deleteByUser_IdAndProductIdAndSize(
+	        UUID userId,
+	        UUID productId,
+	        Size size
+	);
 
-    long deleteAllByUserId(UUID userId);
+	long deleteAllByUser_Id(UUID userId);
 }

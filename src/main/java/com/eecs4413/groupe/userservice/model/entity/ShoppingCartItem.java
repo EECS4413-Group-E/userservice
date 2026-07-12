@@ -2,14 +2,21 @@ package com.eecs4413.groupe.userservice.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 import java.util.UUID;
+
+import com.eecs4413.groupe.userservice.model.enums.Size;
 
 @Entity
 @Table(
@@ -38,12 +45,9 @@ public class ShoppingCartItem {
     @Column(nullable = false, updatable = false)
     private UUID id;
 
-    @Column(
-            name = "user_id",
-            nullable = false,
-            updatable = false
-    )
-    private UUID userId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(
             name = "product_id",
@@ -52,13 +56,14 @@ public class ShoppingCartItem {
     )
     private UUID productId;
 
+    @Enumerated(EnumType.STRING)
     @Column(
             name = "size",
             nullable = false,
             updatable = false,
             length = 20
     )
-    private String size;
+    private Size size;
 
     @Column(name = "quantity", nullable = false)
     private int quantity;
@@ -67,12 +72,12 @@ public class ShoppingCartItem {
     }
 
     public ShoppingCartItem(
-            UUID userId,
+            User user,
             UUID productId,
-            String size,
+            Size size,
             int quantity
     ) {
-        this.userId = userId;
+        this.user = user;
         this.productId = productId;
         this.size = size;
         this.quantity = quantity;
@@ -86,12 +91,12 @@ public class ShoppingCartItem {
         this.id = id;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public UUID getProductId() {
@@ -102,11 +107,11 @@ public class ShoppingCartItem {
         this.productId = productId;
     }
 
-    public String getSize() {
+    public Size getSize() {
         return size;
     }
 
-    public void setSize(String size) {
+    public void setSize(Size size) {
         this.size = size;
     }
 

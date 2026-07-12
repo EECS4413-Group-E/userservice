@@ -4,8 +4,9 @@ import com.eecs4413.groupe.userservice.exception.InvalidShoppingCartQuantityExce
 import com.eecs4413.groupe.userservice.exception.ShoppingCartItemNotFoundException;
 import com.eecs4413.groupe.userservice.exception.UserNotFoundException;
 import com.eecs4413.groupe.userservice.model.entity.ShoppingCartItem;
+import com.eecs4413.groupe.userservice.model.entity.User;
+import com.eecs4413.groupe.userservice.model.enums.Size;
 import com.eecs4413.groupe.userservice.model.request.AddShoppingCartItemRequest;
-import com.eecs4413.groupe.userservice.model.request.UpdateShoppingCartItemRequest;
 import com.eecs4413.groupe.userservice.model.response.ShoppingCartItemResponse;
 import com.eecs4413.groupe.userservice.repository.ShoppingCartItemRepository;
 import com.eecs4413.groupe.userservice.repository.UserRepository;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -37,28 +37,30 @@ public class ShoppingCartService {
         validateUserExists(userId);
 
         return shoppingCartItemRepository
-                .findAllByUserId(userId)
+                .findAllByUser_Id(userId)
                 .stream()
-                .map(this::toResponse)
-                .toList();
-    }
+                .map(ShoppingCartItemResponse::from)
+                .toList();    }
 
     @Transactional
     public ShoppingCartItemResponse addItem(
             UUID userId,
             AddShoppingCartItemRequest request
     ) {
-        validateUserExists(userId);
+    	User user = userRepository
+    	        .findById(userId)
+    	        .orElseThrow(() ->
+    	                new UserNotFoundException(userId)
+    	        );
         validateQuantity(request.quantity());
 
-        String normalizedSize = normalizeSize(request.size());
 
         ShoppingCartItem cartItem =
                 shoppingCartItemRepository
-                        .findByUserIdAndProductIdAndSize(
+                        .findByUser_IdAndProductIdAndSize(
                                 userId,
                                 request.productId(),
-                                normalizedSize
+                                request.size()
                         )
                         .map(existingItem -> {
                             int newQuantity;
@@ -69,8 +71,8 @@ public class ShoppingCartService {
                                         request.quantity()
                                 );
                             } catch (ArithmeticException exception) {
-                                throw new IllegalArgumentException(
-                                        "Shopping cart quantity is too large"
+                            	throw new InvalidShoppingCartQuantityException(
+                                        Integer.MAX_VALUE
                                 );
                             }
 
@@ -81,9 +83,9 @@ public class ShoppingCartService {
                         })
                         .orElseGet(() ->
                                 new ShoppingCartItem(
-                                        userId,
+                                        user,
                                         request.productId(),
-                                        normalizedSize,
+                                        request.size(),
                                         request.quantity()
                                 )
                         );
@@ -91,67 +93,62 @@ public class ShoppingCartService {
         ShoppingCartItem savedItem =
                 shoppingCartItemRepository.save(cartItem);
 
-        return toResponse(savedItem);
-    }
+        return  ShoppingCartItemResponse.from(savedItem);    }
 
     @Transactional
     public ShoppingCartItemResponse updateQuantity(
             UUID userId,
             UUID productId,
-            String size,
-            UpdateShoppingCartItemRequest request
-    ) {
+            Size size,
+            int quantity    ) {
         validateUserExists(userId);
-        validateQuantity(request.quantity());
-
-        String normalizedSize = normalizeSize(size);
+        validateQuantity(quantity);
 
         ShoppingCartItem cartItem =
                 shoppingCartItemRepository
-                        .findByUserIdAndProductIdAndSize(
+                        .findByUser_IdAndProductIdAndSize(
                                 userId,
                                 productId,
-                                normalizedSize
+                                size
                         )
                         .orElseThrow(() ->
                                 new ShoppingCartItemNotFoundException(
                                         userId,
                                         productId,
-                                        normalizedSize
+                                        size
                                 )
                         );
 
-        cartItem.setQuantity(request.quantity());
+        cartItem.setQuantity(quantity);
 
         ShoppingCartItem updatedItem =
                 shoppingCartItemRepository.save(cartItem);
 
-        return toResponse(updatedItem);
+        return ShoppingCartItemResponse.from(updatedItem);
     }
 
     @Transactional
     public void removeItem(
             UUID userId,
             UUID productId,
-            String size
+            Size size
     ) {
         validateUserExists(userId);
 
-        String normalizedSize = normalizeSize(size);
 
         long deletedItems =
                 shoppingCartItemRepository
-                        .deleteByUserIdAndProductIdAndSize(
+                        .deleteByUser_IdAndProductIdAndSize(
                                 userId,
                                 productId,
-                                normalizedSize
+                                size
                         );
 
         if (deletedItems == 0) {
             throw new ShoppingCartItemNotFoundException(
                     userId,
                     productId,
-                    normalizedSize
+                    size
             );
         }
     }
@@ -160,7 +157,7 @@ public class ShoppingCartService {
     public void clearCart(UUID userId) {
         validateUserExists(userId);
 
-        shoppingCartItemRepository.deleteAllByUserId(userId);
+        shoppingCartItemRepository.deleteAllByUser_Id(userId);
     }
 
     private void validateUserExists(UUID userId) {
@@ -177,26 +174,6 @@ public class ShoppingCartService {
         }
     }
 
-    private String normalizeSize(String size) {
-        if (size == null || size.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Size is required"
-            );
-        }
 
-        return size
-                .trim()
-                .toUpperCase(Locale.ROOT);
-    }
-
-    private ShoppingCartItemResponse toResponse(
-            ShoppingCartItem cartItem
-    ) {
-        return new ShoppingCartItemResponse(
-                cartItem.getId(),
-                cartItem.getProductId(),
-                cartItem.getSize(),
-                cartItem.getQuantity()
-        );
-    }
+   
 }

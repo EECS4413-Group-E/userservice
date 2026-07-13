@@ -4,6 +4,8 @@ import com.eecs4413.groupe.userservice.model.enums.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.ColumnDefault;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,13 +28,13 @@ public class User {
     @Column(name = "role", nullable = false)
     private UserRole role = UserRole.USER;
     
-    @OneToMany(
-            mappedBy = "user",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<ShoppingCartItem> shoppingCartItems = new ArrayList<>();
+
+    @Column(name = "store_points")
+    @ColumnDefault("0")
+    private int storePoints = 0;
 
     public UUID getId() {
         return id;
@@ -62,9 +64,7 @@ public class User {
         return shoppingCartItems;
     }
     
-    public void setShoppingCartItems(
-            List<ShoppingCartItem> shoppingCartItems
-    ) {
+    public void setShoppingCartItems(List<ShoppingCartItem> shoppingCartItems) {
         this.shoppingCartItems.clear();
 
         if (shoppingCartItems != null) {
@@ -74,17 +74,20 @@ public class User {
         }
     }
     
-    public void addShoppingCartItem(
-            ShoppingCartItem shoppingCartItem
-    ) {
+    public void addShoppingCartItem(ShoppingCartItem shoppingCartItem) {
         shoppingCartItems.add(shoppingCartItem);
         shoppingCartItem.setUser(this);
     }
     
-    public void removeShoppingCartItem(
-            ShoppingCartItem shoppingCartItem
-    ) {
+    public void removeShoppingCartItem(ShoppingCartItem shoppingCartItem) {
         shoppingCartItems.remove(shoppingCartItem);
         shoppingCartItem.setUser(null);
+    }
+    public int getStorePoints() {
+        return storePoints;
+    }
+
+    public void setStorePoints(int storePoints) {
+        this.storePoints = storePoints;
     }
 }

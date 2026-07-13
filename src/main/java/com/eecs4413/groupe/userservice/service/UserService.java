@@ -25,6 +25,11 @@ public class UserService {
         return _userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
     }
 
+    public int getStorePoints(UUID id) {
+        User user = _userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        return user.getStorePoints();
+    }
+
     public User addUser(User user) {
         if (_userRepository.existsByEmail(user.getEmail())) {
             throw new EmailNotUniqueException(user.getEmail());
@@ -43,6 +48,16 @@ public class UserService {
         }
 
         user.setId(id);
+
+        return _userRepository.save(user);
+    }
+
+    public User updateStorePoints(UUID id, int quantity) {
+        User user = _userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        int currentStorePoints = user.getStorePoints();
+
+        if (currentStorePoints + quantity < 0) throw new NotEnoughPointsException(quantity*-1, currentStorePoints);
+        user.setStorePoints(user.getStorePoints() + quantity);
 
         return _userRepository.save(user);
     }

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,15 +29,15 @@ import java.util.UUID;
 @Validated
 public class ShoppingCartController {
 
-    private final ShoppingCartService shoppingCartService;
+    private final ShoppingCartService _shoppingCartService;
 
     public ShoppingCartController(ShoppingCartService shoppingCartService) {
-        this.shoppingCartService = shoppingCartService;
+        this._shoppingCartService = shoppingCartService;
     }
 
     @GetMapping
     public ResponseEntity<List<ShoppingCartItemResponse>> getCart(@PathVariable UUID userId) {
-        List<ShoppingCartItemResponse> cartItems =shoppingCartService.getCart(userId);
+        List<ShoppingCartItemResponse> cartItems = _shoppingCartService.getCart(userId);
 
         return ResponseEntity.ok(cartItems);
     }
@@ -46,15 +45,9 @@ public class ShoppingCartController {
     @PostMapping
     public ResponseEntity<ShoppingCartItemResponse> addItem(
             @PathVariable UUID userId,
-            @Valid
-            @RequestBody
-            AddShoppingCartItemRequest request
+            @Valid @RequestBody AddShoppingCartItemRequest request
     ) {
-        ShoppingCartItemResponse response =
-                shoppingCartService.addItem(
-                        userId,
-                        request
-                );
+        ShoppingCartItemResponse response = _shoppingCartService.addItem(userId, request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -66,14 +59,10 @@ public class ShoppingCartController {
             @PathVariable UUID userId,
             @PathVariable UUID productId,
             @PathVariable Size size,
-            @RequestParam
-            @Min(
-                    value = 1,
-                    message = "Quantity must be at least 1"
-            )
-            int quantity) {
+            @RequestParam @Min(value = 1, message = "Quantity must be at least 1") int quantity
+    ) {
         ShoppingCartItemResponse response =
-                shoppingCartService.updateQuantity(
+                _shoppingCartService.updateQuantity(
                         userId,
                         productId,
                         size,
@@ -89,7 +78,7 @@ public class ShoppingCartController {
             @PathVariable UUID productId,
             @PathVariable Size size
     ) {
-        shoppingCartService.removeItem(
+        _shoppingCartService.removeItem(
                 userId,
                 productId,
                 size
@@ -99,10 +88,8 @@ public class ShoppingCartController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> clearCart(
-            @PathVariable UUID userId
-    ) {
-        shoppingCartService.clearCart(userId);
+    public ResponseEntity<Void> clearCart(@PathVariable UUID userId) {
+        _shoppingCartService.clearCart(userId);
 
         return ResponseEntity.noContent().build();
     }

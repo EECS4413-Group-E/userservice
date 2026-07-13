@@ -20,23 +20,23 @@ import java.util.UUID;
 @Service
 public class ShoppingCartService {
 
-    private final ShoppingCartItemRepository shoppingCartItemRepository;
-    private final UserRepository userRepository;
+    private final ShoppingCartItemRepository _shoppingCartItemRepository;
+    private final UserRepository _userRepository;
 
     public ShoppingCartService(
             ShoppingCartItemRepository shoppingCartItemRepository,
             UserRepository userRepository
     ) {
-        this.shoppingCartItemRepository =
+        this._shoppingCartItemRepository =
                 shoppingCartItemRepository;
-        this.userRepository = userRepository;
+        this._userRepository = userRepository;
     }
 
     @Transactional(readOnly = true)
     public List<ShoppingCartItemResponse> getCart(UUID userId) {
         validateUserExists(userId);
 
-        return shoppingCartItemRepository
+        return _shoppingCartItemRepository
                 .findAllByUser_Id(userId)
                 .stream()
                 .map(ShoppingCartItemResponse::from)
@@ -47,7 +47,7 @@ public class ShoppingCartService {
             UUID userId,
             AddShoppingCartItemRequest request
     ) {
-    	User user = userRepository
+    	User user = _userRepository
     	        .findById(userId)
     	        .orElseThrow(() ->
     	                new UserNotFoundException(userId)
@@ -56,7 +56,7 @@ public class ShoppingCartService {
 
 
         ShoppingCartItem cartItem =
-                shoppingCartItemRepository
+                _shoppingCartItemRepository
                         .findByUser_IdAndProductIdAndSize(
                                 userId,
                                 request.productId(),
@@ -91,7 +91,7 @@ public class ShoppingCartService {
                         );
 
         ShoppingCartItem savedItem =
-                shoppingCartItemRepository.save(cartItem);
+                _shoppingCartItemRepository.save(cartItem);
 
         return  ShoppingCartItemResponse.from(savedItem);    }
 
@@ -105,7 +105,7 @@ public class ShoppingCartService {
         validateQuantity(quantity);
 
         ShoppingCartItem cartItem =
-                shoppingCartItemRepository
+                _shoppingCartItemRepository
                         .findByUser_IdAndProductIdAndSize(
                                 userId,
                                 productId,
@@ -122,7 +122,7 @@ public class ShoppingCartService {
         cartItem.setQuantity(quantity);
 
         ShoppingCartItem updatedItem =
-                shoppingCartItemRepository.save(cartItem);
+                _shoppingCartItemRepository.save(cartItem);
 
         return ShoppingCartItemResponse.from(updatedItem);
     }
@@ -137,7 +137,7 @@ public class ShoppingCartService {
 
 
         long deletedItems =
-                shoppingCartItemRepository
+                _shoppingCartItemRepository
                         .deleteByUser_IdAndProductIdAndSize(
                                 userId,
                                 productId,
@@ -157,11 +157,11 @@ public class ShoppingCartService {
     public void clearCart(UUID userId) {
         validateUserExists(userId);
 
-        shoppingCartItemRepository.deleteAllByUser_Id(userId);
+        _shoppingCartItemRepository.deleteAllByUser_Id(userId);
     }
 
     private void validateUserExists(UUID userId) {
-        if (!userRepository.existsById(userId)) {
+        if (!_userRepository.existsById(userId)) {
             throw new UserNotFoundException(userId);
         }
     }

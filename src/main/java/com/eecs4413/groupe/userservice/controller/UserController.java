@@ -30,6 +30,12 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
+    @GetMapping("/{id}/points")
+    public ResponseEntity<Integer> getStorePoints(@PathVariable UUID id) {
+        int storePoints = _userService.getStorePoints(id);
+        return new ResponseEntity<>(storePoints, HttpStatus.OK);
+    }
+
     @PostMapping()
     public ResponseEntity<User> addUser(@RequestBody User user) {
         User newUser = _userService.addUser(user);
@@ -39,6 +45,12 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable UUID id, @RequestBody User user) {
         User updatedUser = _userService.updateUser(id, user);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
+
+    @PatchMapping("/{id}/points/update")
+    public ResponseEntity<User> updateStorePoints(@PathVariable UUID id, @RequestParam int quantity) {
+        User updatedUser = _userService.updateStorePoints(id, quantity);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 

@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(
-	    name = "wishlist",
+	    name = "wishlist_item",
 	    uniqueConstraints = {
 	        @UniqueConstraint(columnNames = {"userId", "listingId"}) /*To ensure same product is not added twice */
 	    }

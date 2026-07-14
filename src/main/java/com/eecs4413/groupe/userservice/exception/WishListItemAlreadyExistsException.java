@@ -8,7 +8,7 @@ import java.util.UUID;
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class WishListItemAlreadyExistsException extends RuntimeException {
     public WishListItemAlreadyExistsException(UUID userId, UUID listingId) {
-        super(String.format("Listing with ID: %s is already in wishlist for user with ID: %s",
+        super(String.format("Listing with id %s is already in wishlist for user with id %s",
                 listingId,
                 userId
         ));

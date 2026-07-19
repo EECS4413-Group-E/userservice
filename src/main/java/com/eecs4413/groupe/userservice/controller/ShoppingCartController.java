@@ -1,12 +1,11 @@
 package com.eecs4413.groupe.userservice.controller;
 
 import com.eecs4413.groupe.userservice.model.enums.Size;
-import com.eecs4413.groupe.userservice.model.request.AddShoppingCartItemRequest;
+import com.eecs4413.groupe.userservice.model.request.ShoppingCartItemRequest;
 import com.eecs4413.groupe.userservice.model.response.ShoppingCartItemResponse;
 import com.eecs4413.groupe.userservice.service.ShoppingCartService;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -45,7 +43,7 @@ public class ShoppingCartController {
     @PostMapping
     public ResponseEntity<ShoppingCartItemResponse> addItem(
             @PathVariable UUID userId,
-            @Valid @RequestBody AddShoppingCartItemRequest request
+            @Valid @RequestBody ShoppingCartItemRequest request
     ) {
         ShoppingCartItemResponse response = _shoppingCartService.addItem(userId, request);
 
@@ -54,20 +52,12 @@ public class ShoppingCartController {
                 .body(response);
     }
 
-    @PatchMapping("/{productId}/{size}")
+    @PatchMapping()
     public ResponseEntity<ShoppingCartItemResponse> updateQuantity(
             @PathVariable UUID userId,
-            @PathVariable UUID productId,
-            @PathVariable Size size,
-            @RequestParam @Min(value = 1, message = "Quantity must be at least 1") int quantity
+            @Valid @RequestBody ShoppingCartItemRequest request
     ) {
-        ShoppingCartItemResponse response =
-                _shoppingCartService.updateQuantity(
-                        userId,
-                        productId,
-                        size,
-                        quantity
-                );
+        ShoppingCartItemResponse response = _shoppingCartService.updateQuantity(userId, request);
 
         return ResponseEntity.ok(response);
     }

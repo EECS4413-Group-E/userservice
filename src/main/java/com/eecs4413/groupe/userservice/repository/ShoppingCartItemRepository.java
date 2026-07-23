@@ -15,17 +15,17 @@ public interface ShoppingCartItemRepository extends JpaRepository<ShoppingCartIt
 
 	List<ShoppingCartItem> findAllByUser_Id(UUID userId);
 
-	Optional<ShoppingCartItem> findByUser_IdAndProductIdAndSize(
+	Optional<ShoppingCartItem> findByUserIdAndProductIdAndSize(
 	        UUID userId,
 	        UUID productId,
 	        Size size
 	);
 
-	long deleteByUser_IdAndProductIdAndSize(
+	long deleteByUserIdAndProductIdAndSize(
 	        UUID userId,
 	        UUID productId,
 	        Size size
 	);
 
-	long deleteAllByUser_Id(UUID userId);
+	long deleteAllByUserId(UUID userId);
 }

@@ -6,7 +6,7 @@ import com.eecs4413.groupe.userservice.exception.UserNotFoundException;
 import com.eecs4413.groupe.userservice.model.entity.ShoppingCartItem;
 import com.eecs4413.groupe.userservice.model.entity.User;
 import com.eecs4413.groupe.userservice.model.enums.Size;
-import com.eecs4413.groupe.userservice.model.request.AddShoppingCartItemRequest;
+import com.eecs4413.groupe.userservice.model.request.ShoppingCartItemRequest;
 import com.eecs4413.groupe.userservice.model.response.ShoppingCartItemResponse;
 import com.eecs4413.groupe.userservice.repository.ShoppingCartItemRepository;
 import com.eecs4413.groupe.userservice.repository.UserRepository;
@@ -40,109 +40,87 @@ public class ShoppingCartService {
                 .findAllByUser_Id(userId)
                 .stream()
                 .map(ShoppingCartItemResponse::from)
-                .toList();    }
+                .toList();
+    }
 
     @Transactional
-    public ShoppingCartItemResponse addItem(
-            UUID userId,
-            AddShoppingCartItemRequest request
-    ) {
-    	User user = _userRepository
-    	        .findById(userId)
-    	        .orElseThrow(() ->
-    	                new UserNotFoundException(userId)
-    	        );
+    public ShoppingCartItemResponse addItem(UUID userId, ShoppingCartItemRequest request) {
+        User user = _userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+
         validateQuantity(request.quantity());
 
+        ShoppingCartItem cartItem = _shoppingCartItemRepository.findByUserIdAndProductIdAndSize(
+                        userId,
+                        request.productId(),
+                        request.size()
+                )
+                .map(existingItem -> {
+                    int newQuantity;
+
+                    try {
+                        newQuantity = Math.addExact(
+                                existingItem.getQuantity(),
+                                request.quantity()
+                        );
+                    } catch (ArithmeticException exception) {
+                        throw new InvalidShoppingCartQuantityException(
+                                Integer.MAX_VALUE
+                        );
+                    }
+
+                    validateQuantity(newQuantity);
+                    existingItem.setQuantity(newQuantity);
+
+                    return existingItem;
+                })
+                .orElseGet(() -> new ShoppingCartItem(
+                        user,
+                        request.productId(),
+                        request.size(),
+                        request.quantity())
+                );
+
+        ShoppingCartItem savedItem = _shoppingCartItemRepository.save(cartItem);
+
+        return ShoppingCartItemResponse.from(savedItem);
+    }
+
+    @Transactional
+    public ShoppingCartItemResponse updateQuantity(UUID userId, ShoppingCartItemRequest request) {
+        validateUserExists(userId);
+        validateQuantity(request.quantity());
 
         ShoppingCartItem cartItem =
                 _shoppingCartItemRepository
-                        .findByUser_IdAndProductIdAndSize(
+                        .findByUserIdAndProductIdAndSize(
                                 userId,
                                 request.productId(),
                                 request.size()
                         )
-                        .map(existingItem -> {
-                            int newQuantity;
-
-                            try {
-                                newQuantity = Math.addExact(
-                                        existingItem.getQuantity(),
-                                        request.quantity()
-                                );
-                            } catch (ArithmeticException exception) {
-                            	throw new InvalidShoppingCartQuantityException(
-                                        Integer.MAX_VALUE
-                                );
-                            }
-
-                            validateQuantity(newQuantity);
-                            existingItem.setQuantity(newQuantity);
-
-                            return existingItem;
-                        })
-                        .orElseGet(() ->
-                                new ShoppingCartItem(
-                                        user,
-                                        request.productId(),
-                                        request.size(),
-                                        request.quantity()
-                                )
-                        );
-
-        ShoppingCartItem savedItem =
-                _shoppingCartItemRepository.save(cartItem);
-
-        return  ShoppingCartItemResponse.from(savedItem);    }
-
-    @Transactional
-    public ShoppingCartItemResponse updateQuantity(
-            UUID userId,
-            UUID productId,
-            Size size,
-            int quantity    ) {
-        validateUserExists(userId);
-        validateQuantity(quantity);
-
-        ShoppingCartItem cartItem =
-                _shoppingCartItemRepository
-                        .findByUser_IdAndProductIdAndSize(
-                                userId,
-                                productId,
-                                size
-                        )
                         .orElseThrow(() ->
                                 new ShoppingCartItemNotFoundException(
                                         userId,
-                                        productId,
-                                        size
+                                        request.productId(),
+                                        request.size()
                                 )
                         );
 
-        cartItem.setQuantity(quantity);
+        cartItem.setQuantity(request.quantity());
 
-        ShoppingCartItem updatedItem =
-                _shoppingCartItemRepository.save(cartItem);
+        ShoppingCartItem updatedItem = _shoppingCartItemRepository.save(cartItem);
 
         return ShoppingCartItemResponse.from(updatedItem);
     }
 
     @Transactional
-    public void removeItem(
-            UUID userId,
-            UUID productId,
-            Size size
-    ) {
+    public void removeItem(UUID userId, UUID productId, Size size) {
         validateUserExists(userId);
 
-
-        long deletedItems =
-                _shoppingCartItemRepository
-                        .deleteByUser_IdAndProductIdAndSize(
-                                userId,
-                                productId,
-                                size
-                        );
+        long deletedItems = _shoppingCartItemRepository.deleteByUserIdAndProductIdAndSize(
+                userId,
+                productId,
+                size
+        );
 
         if (deletedItems == 0) {
             throw new ShoppingCartItemNotFoundException(
@@ -157,7 +135,7 @@ public class ShoppingCartService {
     public void clearCart(UUID userId) {
         validateUserExists(userId);
 
-        _shoppingCartItemRepository.deleteAllByUser_Id(userId);
+        _shoppingCartItemRepository.deleteAllByUserId(userId);
     }
 
     private void validateUserExists(UUID userId) {
@@ -168,12 +146,7 @@ public class ShoppingCartService {
 
     private void validateQuantity(int quantity) {
         if (quantity < 1) {
-            throw new InvalidShoppingCartQuantityException(
-                    quantity
-            );
+            throw new InvalidShoppingCartQuantityException(quantity);
         }
     }
-
-
-   
 }

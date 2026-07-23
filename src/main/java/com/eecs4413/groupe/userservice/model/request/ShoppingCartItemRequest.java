@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import com.eecs4413.groupe.userservice.model.enums.Size;
 
-public record AddShoppingCartItemRequest(
+public record ShoppingCartItemRequest(
 
         @NotNull(message = "Product ID is required")
         UUID productId,
@@ -15,11 +15,7 @@ public record AddShoppingCartItemRequest(
         @NotNull(message = "Size is required")
         Size size,
 
-        @Min(
-                value = 1,
-                message = "Quantity must be at least 1"
-        )
+        @Min(value = 1, message = "Quantity must be at least 1")
         int quantity
 
-) {
-}
+) {}

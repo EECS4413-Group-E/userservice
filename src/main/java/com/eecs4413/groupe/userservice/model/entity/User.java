@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +34,13 @@ public class User {
     @JsonIgnore
     private List<ShoppingCartItem> shoppingCartItems = new ArrayList<>();
 
-    @Column(name = "store_points")
+    @Column(name = "store_points", nullable = false)
     @ColumnDefault("0")
     private int storePoints = 0;
+
+    @CreationTimestamp
+    @Column(name = "created_date", nullable = false, updatable = false)
+    private Instant createdDate;
 
     public UUID getId() {
         return id;
@@ -89,5 +95,13 @@ public class User {
 
     public void setStorePoints(int storePoints) {
         this.storePoints = storePoints;
+    }
+
+    public Instant getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
     }
 }

@@ -2,6 +2,7 @@ package com.eecs4413.groupe.userservice.controller;
 
 import com.eecs4413.groupe.userservice.model.entity.User;
 import com.eecs4413.groupe.userservice.service.UserService;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +46,12 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable UUID id, @RequestBody User user) {
         User updatedUser = _userService.updateUser(id, user);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
+
+    @PatchMapping("/{id}/email")
+    public ResponseEntity<User> changeEmail(@PathVariable UUID id, @NotBlank @RequestParam String newEmail) {
+        User updatedUser = _userService.updateEmail(id, newEmail);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 

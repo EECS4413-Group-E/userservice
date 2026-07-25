@@ -52,6 +52,18 @@ public class UserService {
         return _userRepository.save(user);
     }
 
+    public User updateEmail(UUID id, String newEmail) {
+        User currentUser = _userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+
+        if (!newEmail.equals(currentUser.getEmail()) && _userRepository.existsByEmail(newEmail)) {
+            throw new EmailNotUniqueException(newEmail);
+        }
+
+        currentUser.setEmail(newEmail);
+
+        return _userRepository.save(currentUser);
+    }
+
     public User updateStorePoints(UUID id, int quantity) {
         User user = _userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         int currentStorePoints = user.getStorePoints();

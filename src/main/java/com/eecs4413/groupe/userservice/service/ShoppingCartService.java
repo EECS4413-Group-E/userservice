@@ -14,8 +14,7 @@ import com.eecs4413.groupe.userservice.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class ShoppingCartService {
@@ -37,7 +36,7 @@ public class ShoppingCartService {
         validateUserExists(userId);
 
         return _shoppingCartItemRepository
-                .findAllByUser_Id(userId)
+                .findAllByUserId(userId)
                 .stream()
                 .map(ShoppingCartItemResponse::from)
                 .toList();
@@ -83,6 +82,28 @@ public class ShoppingCartService {
         ShoppingCartItem savedItem = _shoppingCartItemRepository.save(cartItem);
 
         return ShoppingCartItemResponse.from(savedItem);
+    }
+
+    @Transactional
+    public List<ShoppingCartItem> replaceUserCart(UUID userId, List<ShoppingCartItemRequest> request) {
+        User user = _userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+
+        _shoppingCartItemRepository.deleteAllByUserId(userId);
+        _shoppingCartItemRepository.flush();
+
+        List<ShoppingCartItem> shoppingCartItems = new ArrayList<>();
+
+        for(ShoppingCartItemRequest itemRequest : request) {
+            validateQuantity(itemRequest.quantity());
+
+            shoppingCartItems.add(new ShoppingCartItem(
+                    user,
+                    itemRequest.productId(),
+                    itemRequest.size(),
+                    itemRequest.quantity()));
+        }
+
+        return _shoppingCartItemRepository.saveAllAndFlush(shoppingCartItems);
     }
 
     @Transactional

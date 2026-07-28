@@ -3,7 +3,9 @@ package com.eecs4413.groupe.userservice.repository;
 import com.eecs4413.groupe.userservice.model.entity.ShoppingCartItem;
 import com.eecs4413.groupe.userservice.model.enums.Size;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,11 +23,15 @@ public interface ShoppingCartItemRepository extends JpaRepository<ShoppingCartIt
 	        Size size
 	);
 
+	@Transactional
+	@Modifying
 	long deleteByUserIdAndProductIdAndSize(
 	        UUID userId,
 	        UUID productId,
 	        Size size
 	);
 
+	@Transactional
+	@Modifying
 	long deleteAllByUserId(UUID userId);
 }

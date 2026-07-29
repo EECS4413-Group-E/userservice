@@ -13,11 +13,9 @@ import java.util.UUID;
 
 public interface WishListRepository extends JpaRepository<WishListItem, UUID> {
 
-	@Transactional
 	@Query("SELECT w FROM WishListItem w WHERE w.userId = ?1")
 	List<WishListItem> findByUserId(UUID userId);
-	
-	@Transactional
+
 	@Query("SELECT exists(SELECT w FROM WishListItem w WHERE w.userId = ?1 AND w.listingId = ?2)")
     boolean existsByUserIdAndlistingId(UUID userId, UUID listingId);
 	
